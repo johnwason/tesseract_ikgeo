@@ -1,0 +1,3 @@
+[submodule "ikgeo"]
+	path = ikgeo
+	url = https://github.com/rpiRobotics/ik-geo.git

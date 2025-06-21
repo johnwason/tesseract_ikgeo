@@ -25,6 +25,10 @@
   <test_depend>tesseract_support</test_depend>
   <test_depend>tesseract_urdf</test_depend>
   <test_depend>liblapack-dev</test_depend>
+  <test_depend>tesseract_environment</test_depend>
+  <test_depend>libomp-dev</test_depend>
+
+  <test_depend>libpcl-all-dev</test_depend>
 
   <export>
     <build_type>cmake</build_type>

@@ -7,6 +7,8 @@ TESSERACT_COMMON_IGNORE_WARNINGS_POP
 #include <tesseract_kinematics/ikgeo/ikgeo_inv_kin.h>
 #include <tesseract_kinematics/core/utils.h>
 
+#include <IK_spherical_2_parallel.h>
+
 namespace tesseract_kinematics
 {
 IKGeo::IKGeo(ikgeo_parameters params,
@@ -45,16 +47,38 @@ IKSolutions IKGeo::calcInvKin(const tesseract_common::TransformMap& tip_link_pos
   assert(tip_link_poses.find(tip_link_name_) != tip_link_poses.end());                      // NOLINT
   assert(std::abs(1.0 - tip_link_poses.at(tip_link_name_).matrix().determinant()) < 1e-6);  // NOLINT
   
-  // NOLINTNEXTLINE
-  //opw_kinematics::Solutions<double> sols = opw_kinematics::inverse(params_, tip_link_poses.at(tip_link_name_));
-
-  // Check the output
-  IKSolutions solution_set;
-  //solution_set.reserve(sols.size());
-  //for (auto& sol : sols)
+  Kinematics<6, 7> kin;
+  for(size_t i=0; i < params_.H.size(); ++i)
   {
-    //if (opw_kinematics::isValid<double>(sol))
-     // solution_set.emplace_back(Eigen::Map<Eigen::VectorXd>(sol.data(), static_cast<Eigen::Index>(sol.size())));
+    kin.H.col(i) = params_.H[i];
+  }
+  for(size_t i=0; i < params_.P.size(); ++i)
+  {
+    kin.P.col(i) = params_.P[i];
+  }
+
+  std::cout << "IKGeo: H = " << kin.H.transpose() << std::endl;
+  std::cout << "IKGeo: P = " << kin.P.transpose() << std::endl;
+
+  std::cout<< tip_link_poses.at(tip_link_name_).rotation() << std::endl;
+  std::cout<< tip_link_poses.at(tip_link_name_).translation() << std::endl;
+
+  auto res = IK_spherical_2_parallel(tip_link_poses.at(tip_link_name_).rotation(),
+                  tip_link_poses.at(tip_link_name_).translation(),
+                  kin);
+  
+  IKSolutions solution_set;
+
+  for (size_t i=0; i< res.q.size(); i++)
+  { 
+    Eigen::VectorXd res1 = res.q[i];
+    assert(res1.size() == 6);  // NOLINT
+    // for (size_t j=0; j<res1.size(); ++j)
+    // {
+    //   res1(j) += params_.joint_offsets[j];  // Apply joint offsets
+    // }
+
+    solution_set.emplace_back(Eigen::Map<Eigen::VectorXd>(res.q[i].data(), static_cast<Eigen::Index>(res.q[i].size())));    
   }
 
   return solution_set;

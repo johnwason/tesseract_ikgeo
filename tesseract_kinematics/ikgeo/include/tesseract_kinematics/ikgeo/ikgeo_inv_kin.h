@@ -14,8 +14,9 @@ static const std::string IKGEO_CHAIN_SOLVER_NAME = "IKGeo";
 
 struct ikgeo_parameters
 {
-    Eigen::Matrix<double, 3, 7> H;
-	Eigen::Matrix<double, 3, 7> P;
+  std::vector<Eigen::Vector3d> H;
+	std::vector<Eigen::Vector3d> P;
+  std::vector<double> joint_offsets;
 };
 
 /**@brief IK-Geo Inverse Kinematics Implementation. */
@@ -63,7 +64,7 @@ public:
   InverseKinematics::UPtr clone() const override final;
 
 protected:
-  ikgeo_parameters params_; /**< @brief The opw kinematics parameters */
+  ikgeo_parameters params_; /**< @brief The ikgeo kinematics parameters */
   std::string base_link_name_;                /**< @brief Link name of first link in the kinematic object */
   std::string tip_link_name_;                 /**< @brief Link name of last kink in the kinematic object */
   std::vector<std::string> joint_names_;      /**< @brief Joint names for the kinematic object */

@@ -33,15 +33,20 @@ endif()
 # Load variable for clang tidy args, compiler options and cxx version
 tesseract_variables()
 
+set(TESSERACT_COMPILE_OPTIONS_PRIVATE
+          -Werror=all
+          -Werror=extra
+          #-Werror=conversion
+          #-Werror=sign-conversion
+          -Wno-sign-compare
+          -Werror=non-virtual-dtor)
+
 # Define compile-time default variables
 if(MSVC)
   set(TESSERACT_KINEMATICS_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 else()
   set(TESSERACT_KINEMATICS_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
-
-# Variable for kinematics plugins
-set(KINEMATICS_PLUGINS "")
 
 # ikgeo
 option(TESSERACT_BUILD_IKGEO "Build ikgeo components" ON)
@@ -51,11 +56,17 @@ if(TESSERACT_BUILD_IKGEO)
   add_subdirectory(tesseract_kinematics/ikgeo)
 endif()
 
-# Add compiler definition to core so it can find all plugins produced
-string(
-  REPLACE ";"
-          ":"
-          KINEMATICS_PLUGINS_STRING
-          "${KINEMATICS_PLUGINS}")
-target_compile_definitions(${PROJECT_NAME}_ikgeo PRIVATE TESSERACT_KINEMATICS_PLUGINS="${KINEMATICS_PLUGINS_STRING}")
+if(TESSERACT_ENABLE_TESTING OR TESSERACT_KINEMATICS_ENABLE_TESTING)
+  enable_testing()
+  add_run_tests_target(ENABLE ${TESSERACT_ENABLE_RUN_TESTING})
+  add_subdirectory(test)
+endif()
 
+configure_package()
+
+if(TESSERACT_ENABLE_TESTING OR TESSERACT_KINEMATICS_ENABLE_TESTING)
+  foreach(dir urdf)
+    install(DIRECTORY ${dir}/ DESTINATION share/${PROJECT_NAME}/${dir})
+  endforeach()
+
+endif()
