@@ -34,8 +34,8 @@ TEST(IKGeo, IKGeoInvKin)
       EXPECT_EQ(invkin.getSolverName(), "IKGeoInvKin");
 
       Eigen::VectorXd test_joints = Eigen::VectorXd::Zero(6);
-    //test_joints << 0.1, -0.2, 0.03, -0.1, -0.5, 1.0;
-    test_joints << 0.0, 0.0, -1.57079632679, 0.0, 0.0, 0.0;
+    test_joints << 0.1, -0.2, 0.03, -0.1, -0.5, 1.0;
+    //test_joints << 0.0, 0.0, -1.57079632679, 0.0, 0.0, 0.0;
     auto fwd_kin = kin_group->calcFwdKin(test_joints);
     
     tesseract_common::TransformMap ik_input;

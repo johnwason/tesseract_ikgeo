@@ -57,12 +57,6 @@ IKSolutions IKGeo::calcInvKin(const tesseract_common::TransformMap& tip_link_pos
     kin.P.col(i) = params_.P[i];
   }
 
-  std::cout << "IKGeo: H = " << kin.H.transpose() << std::endl;
-  std::cout << "IKGeo: P = " << kin.P.transpose() << std::endl;
-
-  std::cout<< tip_link_poses.at(tip_link_name_).rotation() << std::endl;
-  std::cout<< tip_link_poses.at(tip_link_name_).translation() << std::endl;
-
   auto res = IK_spherical_2_parallel(tip_link_poses.at(tip_link_name_).rotation(),
                   tip_link_poses.at(tip_link_name_).translation(),
                   kin);
@@ -73,12 +67,12 @@ IKSolutions IKGeo::calcInvKin(const tesseract_common::TransformMap& tip_link_pos
   { 
     Eigen::VectorXd res1 = res.q[i];
     assert(res1.size() == 6);  // NOLINT
-    // for (size_t j=0; j<res1.size(); ++j)
-    // {
-    //   res1(j) += params_.joint_offsets[j];  // Apply joint offsets
-    // }
+    for (size_t j=0; j<res1.size(); ++j)
+    {
+      res1(j) += params_.joint_offsets[j];  // Apply joint offsets
+    }
 
-    solution_set.emplace_back(Eigen::Map<Eigen::VectorXd>(res.q[i].data(), static_cast<Eigen::Index>(res.q[i].size())));    
+    solution_set.emplace_back(Eigen::Map<Eigen::VectorXd>(res1.data(), static_cast<Eigen::Index>(res1.size())));    
   }
 
   return solution_set;
