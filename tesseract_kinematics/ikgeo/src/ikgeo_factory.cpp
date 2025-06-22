@@ -70,6 +70,34 @@ std::unique_ptr<InverseKinematics> IKGeoInvKinFactory::create(const std::string&
     else
       throw std::runtime_error("IKGeoInvKinFactory, missing 'tip_link' entry");
     
+    if (YAML::Node n = config["solver"])
+    {
+      if (n.IsScalar())
+      {
+        auto solver = n.as<std::string>();
+        if (solver == "IK_2_intersecting")
+        params.solver_type = ikgeo_solver::IK_2_intersecting;
+        else if (solver == "IK_2_parallel")
+        params.solver_type = ikgeo_solver::IK_2_parallel;
+        else if (solver == "IK_3_parallel_2_intersecting")
+        params.solver_type = ikgeo_solver::IK_3_parallel_2_intersecting;
+        else if (solver == "IK_3_parallel")
+        params.solver_type = ikgeo_solver::IK_3_parallel;
+        else if (solver == "IK_gen_6_dof")
+        params.solver_type = ikgeo_solver::IK_gen_6_dof;
+        else if (solver == "IK_spherical_2_intersecting")
+        params.solver_type = ikgeo_solver::IK_spherical_2_intersecting;
+        else if (solver == "IK_spherical_2_parallel")
+        params.solver_type = ikgeo_solver::IK_spherical_2_parallel;
+        else if (solver == "IK_spherical")
+        params.solver_type = ikgeo_solver::IK_spherical;
+        else
+        throw std::runtime_error("IKGeoInvKinFactory, unknown 'solver' type: " + solver);
+    }
+      else
+        throw std::runtime_error("IKGeoInvKinFactory, 'solver_name' should be a string!");
+    }
+
     if (YAML::Node ikgeo_params = config["params"])
     {
       if (YAML::Node n = ikgeo_params["H"])

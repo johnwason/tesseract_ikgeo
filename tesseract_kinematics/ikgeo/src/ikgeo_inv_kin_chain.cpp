@@ -7,7 +7,15 @@ TESSERACT_COMMON_IGNORE_WARNINGS_POP
 #include <tesseract_kinematics/ikgeo/ikgeo_inv_kin.h>
 #include <tesseract_kinematics/core/utils.h>
 
+#include <IK_2_intersecting.h>
+#include <IK_2_parallel.h>
+#include <IK_3_parallel_2_intersecting.h>
+#include <IK_3_parallel.h>
+#include <IK_gen_6_dof.h>
+#include <IK_spherical.h>
+#include <IK_spherical_2_intersecting.h>
 #include <IK_spherical_2_parallel.h>
+#include <IK_spherical.h>
 
 namespace tesseract_kinematics
 {
@@ -56,10 +64,44 @@ IKSolutions IKGeo::calcInvKin(const tesseract_common::TransformMap& tip_link_pos
   {
     kin.P.col(i) = params_.P[i];
   }
-
-  auto res = IK_spherical_2_parallel(tip_link_poses.at(tip_link_name_).rotation(),
-                  tip_link_poses.at(tip_link_name_).translation(),
-                  kin);
+  Solution<6> res;
+  switch (params_.solver_type)
+  {
+    case ikgeo_solver::IK_2_intersecting:
+      res = IK_2_intersecting(tip_link_poses.at(tip_link_name_).rotation(),
+                              tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    case ikgeo_solver::IK_2_parallel:
+      res = IK_2_parallel(tip_link_poses.at(tip_link_name_).rotation(),
+                          tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    case ikgeo_solver::IK_3_parallel_2_intersecting:
+      res = IK_3_parallel_2_intersecting(tip_link_poses.at(tip_link_name_).rotation(),
+                                         tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    case ikgeo_solver::IK_3_parallel:
+      res = IK_3_parallel(tip_link_poses.at(tip_link_name_).rotation(),
+                          tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    case ikgeo_solver::IK_gen_6_dof:
+      res = IK_gen_6_dof(tip_link_poses.at(tip_link_name_).rotation(),
+                         tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    case ikgeo_solver::IK_spherical_2_intersecting:
+      res = IK_spherical_2_intersecting(tip_link_poses.at(tip_link_name_).rotation(),
+                                        tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    case ikgeo_solver::IK_spherical_2_parallel:
+      res = IK_spherical_2_parallel(tip_link_poses.at(tip_link_name_).rotation(),
+                                    tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    case ikgeo_solver::IK_spherical:
+      res = IK_spherical(tip_link_poses.at(tip_link_name_).rotation(),
+                  tip_link_poses.at(tip_link_name_).translation(), kin);
+      break;
+    default:
+      throw std::runtime_error("IKGeo, unsupported solver type!");
+  }
   
   IKSolutions solution_set;
 

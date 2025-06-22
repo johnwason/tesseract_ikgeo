@@ -12,12 +12,27 @@ namespace tesseract_kinematics
 {
 static const std::string IKGEO_CHAIN_SOLVER_NAME = "IKGeo";
 
+enum class ikgeo_solver
+{
+  IK_2_intersecting,
+  IK_2_parallel,
+  IK_3_parallel_2_intersecting,
+  IK_3_parallel,
+  IK_gen_6_dof,
+  IK_spherical_2_intersecting,
+  IK_spherical_2_parallel,
+  IK_spherical
+
+};
+
 struct ikgeo_parameters
 {
+  ikgeo_solver solver_type{ ikgeo_solver::IK_spherical_2_parallel };
   std::vector<Eigen::Vector3d> H;
 	std::vector<Eigen::Vector3d> P;
   std::vector<double> joint_offsets;
 };
+
 
 /**@brief IK-Geo Inverse Kinematics Implementation. */
 class IKGeo : public InverseKinematics
