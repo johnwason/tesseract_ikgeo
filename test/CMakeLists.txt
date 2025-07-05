@@ -1,15 +1,11 @@
 find_gtest()
-
-find_package(PCL REQUIRED COMPONENTS io)
 find_package(tesseract_environment REQUIRED)
-find_package(LAPACK REQUIRED) # Required for ikfast
 
 add_executable(${PROJECT_NAME}_unit ikgeo_unit.cpp)
 target_link_libraries(
   ${PROJECT_NAME}_unit
   PRIVATE GTest::GTest
           GTest::Main
-          OpenMP::OpenMP_CXX
           tesseract::tesseract_environment
           ${PROJECT_NAME}_factory)
 target_compile_options(${PROJECT_NAME}_unit PRIVATE ${TESSERACT_COMPILE_OPTIONS_PRIVATE}
